@@ -1,7 +1,8 @@
 from html.parser import HTMLParser
 from pathlib import Path
-from icalendar import cal
+from icalendar import Event, Calendar
 from datetime import datetime
+import pytz
 
 
 class MyParser(HTMLParser):
@@ -48,7 +49,39 @@ class MyParser(HTMLParser):
 
 
 if __name__ == "__main__":
-    with Path("Sidoti Roster.htm").open() as f:
+    cal = Calendar()
+    file = Path("Sidoti Roster")
+    with file.with_suffix(".htm").open() as f:
         html = f.read()
         parser = MyParser()
         parser.feed(html)
+        shifts = []
+        for date, event in zip(parser.dates, parser.events):
+
+            if "\xa0" in event:
+                continue
+
+            shift = Event()
+            date = datetime.strptime(date, "%a %d %b").replace(
+                year=2022, tzinfo=pytz.timezone("Australia/Sydney")
+            )
+
+            if "eve " in event.lower():
+                start = date.replace(hour=14)
+                end = date.replace(hour=23, minute=59)
+            else:
+                start = date.replace(hour=8)
+                end = date.replace(hour=18)
+
+            shift.add("summary", event)
+            shift.add("dtstart", start)
+            shift.add("dtend", end)
+            shifts.append(shift)
+
+        cal["dtstart"] = shifts[0]["dtstart"].to_ical()
+        cal["summary"] = f"{file.stem}"
+
+        for shift in shifts:
+            cal.add_component(shift)
+
+    file.with_suffix(".ics").write_bytes(cal.to_ical())
