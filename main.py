@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
             shift = Event()
             date = datetime.strptime(date, "%a %d %b").replace(
-                year=2022, tzinfo=pytz.timezone("Australia/Sydney")
+                year=datetime.now().year, tzinfo=pytz.timezone("Australia/Sydney")
             )
 
             if "eve " in event.lower():
