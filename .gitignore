@@ -1,3 +1,4 @@
 *.htm
 *.ics
 .history/
+venv/
