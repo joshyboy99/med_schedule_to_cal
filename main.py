@@ -66,9 +66,12 @@ if __name__ == "__main__":
                 year=datetime.now().year, tzinfo=pytz.timezone("Australia/Sydney")
             )
 
-            if "eve " in event.lower():
+            if "eve " in event.lower() or "evening " in event.lower():
                 start = date.replace(hour=14)
                 end = date.replace(hour=23, minute=59)
+            elif "night " in event.lower():
+                start = date.replace(hour=22, minute=30)
+                end = date.replace(day=date.day + 1, hour=8, minute=30)
             else:
                 start = date.replace(hour=8)
                 end = date.replace(hour=18)
